@@ -48,10 +48,12 @@ class _RichTextEditorState extends State<RichTextEditor>
   late TextEditingController _displayController;
   late TextEditingController _titleController;
   late TextEditingController _contentController;
+  final FocusNode _contentFocusNode = FocusNode();
   String _lastControllerText = '';
   late ImageOverlayManager _imageManager;
   late AudioOverlayManager _audioManager; // Add this
   late TodoOverlayManager _todoManager;
+  bool _isUpdatingFromController = false;
   @override
   void initState() {
     super.initState();
@@ -107,6 +109,7 @@ class _RichTextEditorState extends State<RichTextEditor>
     _displayController.dispose();
     _titleController.dispose();
     _contentController.dispose();
+    _contentFocusNode.dispose();
     _scrollController.dispose();
     _imageManager.dispose();
     _audioManager.dispose();
@@ -139,6 +142,8 @@ class _RichTextEditorState extends State<RichTextEditor>
   }
 
   void _updateDisplayController() {
+    if (_isUpdatingFromController) return;
+    
     final cleanText = widget.controller.text
         .replaceAll(RegExp(r'\[IMAGE:[^\]]+\]\n?'), '')
         .replaceAll(RegExp(r'\[IMAGE_META:[^\]]+\]\n?'), '')
@@ -148,6 +153,7 @@ class _RichTextEditorState extends State<RichTextEditor>
         .trim();
 
     if (_displayController.text != cleanText) {
+      _isUpdatingFromController = true;
       _displayController.text = cleanText;
 
       // Split and update title/content controllers
@@ -157,10 +163,13 @@ class _RichTextEditorState extends State<RichTextEditor>
         _contentController.text =
             lines.length > 1 ? lines.sublist(1).join('\n') : '';
       }
+      _isUpdatingFromController = false;
     }
   }
 
   void _onDisplayTextChanged(String value) {
+    if (_isUpdatingFromController) return;
+    
     final RegExp imageRegex = RegExp(r'\[IMAGE:([^\]]+)\]');
     final RegExp audioRegex = RegExp(r'\[AUDIO:([^\]]+)\]');
     final RegExp todoMetaRegex = RegExp(r'\[TODO_META:[^\]]+\]');
@@ -192,16 +201,13 @@ class _RichTextEditorState extends State<RichTextEditor>
     }
 
     _lastControllerText = newText;
+    _isUpdatingFromController = true;
     widget.controller.text = newText;
     _displayController.text = value;
+    _isUpdatingFromController = false;
 
-    // Update title and content controllers
-    final lines = value.split('\n');
-    if (lines.isNotEmpty) {
-      _titleController.text = lines[0];
-      _contentController.text =
-          lines.length > 1 ? lines.sublist(1).join('\n') : '';
-    }
+    // Don't update title/content controllers here as they triggered this change
+    // Updating them here causes cursor jumping and only allows 1 character to be typed
   }
 
   void _handleTapOutside() {
@@ -250,14 +256,17 @@ class _RichTextEditorState extends State<RichTextEditor>
           ),
           padding: const EdgeInsets.only(bottom: 8),
           onChanged: (value) {
-            _onDisplayTextChanged(value +
-                (_contentController.text.isEmpty
-                    ? ''
-                    : '\n${_contentController.text}'));
+            if (!_isUpdatingFromController) {
+              _onDisplayTextChanged(value +
+                  (_contentController.text.isEmpty
+                      ? ''
+                      : '\n${_contentController.text}'));
+            }
           },
         ),
         CupertinoTextField(
           controller: _contentController,
+          focusNode: _contentFocusNode,
           placeholder: 'Add your note content...',
           maxLines: null,
           minLines: 15,
@@ -270,8 +279,10 @@ class _RichTextEditorState extends State<RichTextEditor>
           ),
           padding: EdgeInsets.zero,
           onChanged: (value) {
-            _onDisplayTextChanged(
-                _titleController.text + (value.isEmpty ? '' : '\n$value'));
+            if (!_isUpdatingFromController) {
+              _onDisplayTextChanged(
+                  _titleController.text + (value.isEmpty ? '' : '\n$value'));
+            }
           },
         ),
       ],
@@ -298,7 +309,11 @@ class _RichTextEditorState extends State<RichTextEditor>
               constraints.maxWidth, constraints.maxHeight)); // Add this line
 
           return GestureDetector(
-            onTap: _handleTapOutside,
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              // Only deselect if not tapping on text fields
+              _handleTapOutside();
+            },
             onDoubleTap: () {
               // Show todo creation dialog
               showCupertinoDialog(
