@@ -1,0 +1,41 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Deploy to Firebase App Distribution"
+  lane :deploy_to_firebase do
+    Dir.chdir("..") do
+      sh("flutter clean")
+      sh("flutter pub get")
+      sh("flutter build ios --release --no-codesign")
+    end
+    
+    # Create IPA
+    sh("cd ../build/ios/iphoneos && mkdir -p Payload && cp -r Runner.app Payload/ && zip -r app-release.ipa Payload && rm -rf Payload")
+    
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID_IOS"],
+      firebase_cli_token: ENV["FIREBASE_TOKEN"],
+      ipa_path: "../build/ios/iphoneos/app-release.ipa",
+      groups: "testers",
+      release_notes: "Automated iOS build from CI/CD pipeline"
+    )
+  end
+
+  desc "Run tests only"
+  lane :test do
+    Dir.chdir("..") do
+      sh("flutter pub get")
+      sh("flutter test")
+    end
+  end
+
+  desc "Build only"
+  lane :build do
+    Dir.chdir("..") do
+      sh("flutter clean")
+      sh("flutter pub get")
+      sh("flutter build ios --release --no-codesign")
+    end
+  end
+end
+
