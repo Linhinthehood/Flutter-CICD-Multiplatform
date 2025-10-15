@@ -112,21 +112,21 @@ jobs:
         flutter clean
         rm -rf ios/Pods ios/Podfile.lock
     
-    - name: Build iOS (no codesign)
-      run: flutter build ios --release --no-codesign
+    - name: Build iOS (debug signed)
+      run: flutter build ios --debug
     
     - name: Create IPA archive
       run: |
-        cd build/ios/iphoneos
+        cd build/ios/Debug-iphoneos
         mkdir Payload
         cp -r Runner.app Payload/
-        zip -r app-release.ipa Payload
+        zip -r app-debug.ipa Payload
     
     - name: Upload IPA
       uses: actions/upload-artifact@v4
       with:
-        name: release-ipa
-        path: build/ios/iphoneos/app-release.ipa
+        name: debug-ipa
+        path: build/ios/Debug-iphoneos/app-debug.ipa
         retention-days: 30
     
     - name: Deploy to Firebase App Distribution

@@ -6,9 +6,9 @@ platform :ios do
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID_IOS"],
       firebase_cli_token: ENV["FIREBASE_TOKEN"],
-      ipa_path: "../build/ios/iphoneos/app-release.ipa",
+      ipa_path: "../build/ios/Debug-iphoneos/app-debug.ipa",
       groups: "testers",
-      release_notes: "Automated iOS build from CI/CD pipeline"
+      release_notes: "Automated iOS debug build from CI/CD pipeline"
     )
   end
 
