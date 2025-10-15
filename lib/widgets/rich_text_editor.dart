@@ -143,7 +143,7 @@ class _RichTextEditorState extends State<RichTextEditor>
 
   void _updateDisplayController() {
     if (_isUpdatingFromController) return;
-    
+
     final cleanText = widget.controller.text
         .replaceAll(RegExp(r'\[IMAGE:[^\]]+\]\n?'), '')
         .replaceAll(RegExp(r'\[IMAGE_META:[^\]]+\]\n?'), '')
@@ -169,7 +169,7 @@ class _RichTextEditorState extends State<RichTextEditor>
 
   void _onDisplayTextChanged(String value) {
     if (_isUpdatingFromController) return;
-    
+
     final RegExp imageRegex = RegExp(r'\[IMAGE:([^\]]+)\]');
     final RegExp audioRegex = RegExp(r'\[AUDIO:([^\]]+)\]');
     final RegExp todoMetaRegex = RegExp(r'\[TODO_META:[^\]]+\]');
