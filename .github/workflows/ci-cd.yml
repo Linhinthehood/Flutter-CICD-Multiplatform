@@ -107,6 +107,12 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
     
+    - name: Install CocoaPods
+      run: |
+        sudo gem install cocoapods
+        cd ios
+        pod install
+    
     - name: Build iOS (no codesign)
       run: flutter build ios --release --no-codesign
     
