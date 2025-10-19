@@ -3,6 +3,8 @@ name: CI/CD
 on:
   push:
     branches: [ main, develop ]
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0, v2.1.3, etc.
   pull_request:
     branches: [ main ]
 
@@ -34,7 +36,7 @@ jobs:
   build-android:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     
     steps:
     - uses: actions/checkout@v4
@@ -135,7 +137,7 @@ jobs:
   build-macos:
     needs: test
     runs-on: macos-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     
     steps:
     - uses: actions/checkout@v4
@@ -167,7 +169,7 @@ jobs:
   build-windows:
     needs: test
     runs-on: windows-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     
     steps:
     - uses: actions/checkout@v4
@@ -194,3 +196,36 @@ jobs:
         name: release-windows
         path: build/windows/note_app-windows.zip
         retention-days: 30
+
+  create-release:
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Download macOS App
+      uses: actions/download-artifact@v4
+      with:
+        name: release-macos
+        path: ./artifacts
+    
+    - name: Download Windows App
+      uses: actions/download-artifact@v4
+      with:
+        name: release-windows
+        path: ./artifacts
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ./artifacts/note_app-macos.zip
+          ./artifacts/note_app-windows.zip
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
