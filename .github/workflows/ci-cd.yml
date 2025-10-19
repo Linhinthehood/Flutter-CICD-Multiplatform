@@ -83,54 +83,54 @@ jobs:
         cd android
         bundle exec fastlane deploy_to_firebase
 
-  build-ios:
-    needs: test
-    runs-on: macos-latest
-    if: github.ref == 'refs/heads/main'
+  # build-ios:
+  #   needs: test
+  #   runs-on: macos-latest
+  #   if: github.ref == 'refs/heads/main'
     
-    steps:
-    - uses: actions/checkout@v4
+  #   steps:
+  #   - uses: actions/checkout@v4
     
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.35.2'
-        channel: 'stable'
+  #   - name: Setup Flutter
+  #     uses: subosito/flutter-action@v2
+  #     with:
+  #       flutter-version: '3.35.2'
+  #       channel: 'stable'
     
-    - name: Setup Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2'
-        bundler-cache: true
-        working-directory: ios
+  #   - name: Setup Ruby
+  #     uses: ruby/setup-ruby@v1
+  #     with:
+  #       ruby-version: '3.2'
+  #       bundler-cache: true
+  #       working-directory: ios
     
-    - name: Install dependencies
-      run: flutter pub get
+  #   - name: Install dependencies
+  #     run: flutter pub get
     
-    - name: Build iOS (no codesign)
-      run: flutter build ios --release --no-codesign
+  #   - name: Build iOS (no codesign)
+  #     run: flutter build ios --release --no-codesign
     
-    - name: Create IPA archive
-      run: |
-        cd build/ios/iphoneos
-        mkdir Payload
-        cp -r Runner.app Payload/
-        zip -r app-release.ipa Payload
+  #   - name: Create IPA archive
+  #     run: |
+  #       cd build/ios/iphoneos
+  #       mkdir Payload
+  #       cp -r Runner.app Payload/
+  #       zip -r app-release.ipa Payload
     
-    - name: Upload IPA
-      uses: actions/upload-artifact@v4
-      with:
-        name: release-ipa
-        path: build/ios/iphoneos/app-release.ipa
-        retention-days: 30
+  #   - name: Upload IPA
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: release-ipa
+  #       path: build/ios/iphoneos/app-release.ipa
+  #       retention-days: 30
     
-    - name: Deploy to Firebase App Distribution
-      env:
-        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        FIREBASE_APP_ID_IOS: ${{ secrets.FIREBASE_APP_ID_IOS }}
-      run: |
-        cd ios
-        bundle exec fastlane deploy_to_firebase
+  #   - name: Deploy to Firebase App Distribution
+  #     env:
+  #       FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+  #       FIREBASE_APP_ID_IOS: ${{ secrets.FIREBASE_APP_ID_IOS }}
+  #     run: |
+  #       cd ios
+  #       bundle exec fastlane deploy_to_firebase
 
   build-macos:
     needs: test
