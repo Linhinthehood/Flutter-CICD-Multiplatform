@@ -1,9 +1,14 @@
-# Note App
+# Flutter Note App with CI/CD Pipeline
 
-A cross-platform Flutter note-taking application with rich text editing, image support, audio playback, todos, and semantic search capabilities.
+A cross-platform Flutter note-taking application demonstrating a production-ready CI/CD workflow with automated testing, multi-platform builds, and GitHub Releases integration.
 
-## Features
+### Key Highlights
+- 🚀 **Automated CI/CD**: GitHub Actions workflow with testing, building, and releasing
+- 📦 **GitHub Releases**: Automatic release creation with macOS and Windows builds
+- 🔄 **Multi-platform Builds**: Android, macOS, and Windows
+- 🔥 **Firebase Integration**: Automated deployment to Firebase App Distribution
 
+### Application Features
 - 📝 Rich text editing with formatting support
 - 🖼️ Image insertion and management
 - 🎵 Audio playback integration
@@ -46,27 +51,74 @@ flutter run
 
 ## CI/CD Pipeline
 
-This project uses GitHub Actions for automated testing, building, and deployment.
+This project uses GitHub Actions for automated testing, building, and deployment with GitHub Releases.
 
 ### Automated Workflows
 
 - ✅ **Testing**: Runs on every push to `main` and `develop`
 - ✅ **Code Analysis**: Format checking and static analysis
-- ✅ **Multi-platform Builds**: Android, iOS, macOS, and Windows
-- ✅ **Firebase App Distribution**: Automatic deployment to testers
+- ✅ **Multi-platform Builds**: Android, macOS, and Windows
+- ✅ **GitHub Releases**: Automatic release creation with desktop builds
+- ✅ **Firebase App Distribution**: Automatic deployment to testers (Android)
 
 ### Build Artifacts
 
-When you push to `main`, the following artifacts are automatically built:
+**On push to `main` branch:**
+- Android: APK and App Bundle (stored as artifacts for 30 days)
+- macOS: .app bundle (stored as artifacts for 30 days)
+- Windows: Executable with dependencies (stored as artifacts for 30 days)
+- Android builds deployed to Firebase App Distribution
 
-1. **Android**: APK and App Bundle (AAB)
-2. **iOS**: IPA file
-3. **macOS**: .app bundle (zipped)
-4. **Windows**: Executable with dependencies (zipped)
+**On version tag push (e.g., `v1.0.0`):**
+- All above builds are created
+- **GitHub Release is automatically created** with:
+  - ✅ macOS .app bundle (zipped)
+  - ✅ Windows executable (zipped)
+- Release appears in the **Releases tab** for public download
 
-All artifacts are:
-- Available in GitHub Actions for 30 days
-- Automatically deployed to Firebase App Distribution (Android & iOS)
+## Creating a Release
+
+To create a new release with macOS and Windows builds:
+
+### Option 1: Using Git Tags (Recommended)
+
+```bash
+# 1. Make sure you're on the latest main branch
+git checkout main
+git pull origin main
+
+# 2. Create a version tag (semantic versioning)
+git tag v1.0.0
+
+# 3. Push the tag to trigger the release workflow
+git push origin v1.0.0
+```
+
+### Option 2: Using GitHub Web Interface
+
+1. Go to your repository on GitHub
+2. Click **"Releases"** → **"Create a new release"**
+3. Click **"Choose a tag"** → Type `v1.0.0` → **"Create new tag"**
+4. Select target: `main` branch
+5. Click **"Publish release"**
+
+### What Happens Next:
+
+1. ✅ GitHub Actions runs all tests
+2. ✅ Builds Android, macOS, and Windows versions
+3. ✅ Creates a GitHub Release with macOS and Windows builds
+4. ✅ Release appears in the **Releases tab** for download
+5. ✅ Android builds deployed to Firebase App Distribution
+
+**Note**: You don't need new code changes to create a release. Tags work with your current code!
+
+### Workflow Summary
+
+| Action | Tests Run? | Builds Created? | Release Created? |
+|--------|-----------|-----------------|------------------|
+| Push to `develop` | ✅ Yes | ❌ No | ❌ No |
+| Push to `main` | ✅ Yes | ✅ Yes (artifacts only) | ❌ No |
+| Push tag `v*` | ✅ Yes | ✅ Yes | ✅ Yes (macOS + Windows) |
 
 ## Firebase App Distribution Setup
 
