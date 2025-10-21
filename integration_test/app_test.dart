@@ -3,16 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:integration_test/integration_test.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:notes/data/services/todo_api_service.dart';
 import 'package:notes/presentation/pages/todo_list_page.dart';
 import 'package:notes/presentation/providers/todo_provider.dart';
 
-// Generate mocks
-@GenerateMocks([http.Client])
-import 'app_test.mocks.dart';
+// Reuse mocks from test directory
+import '../test/unit/todo_api_service_test.mocks.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

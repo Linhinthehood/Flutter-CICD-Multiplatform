@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
-import 'package:notes/data/models/todo_model.dart';
 import 'package:notes/data/services/todo_api_service.dart';
 import 'package:notes/presentation/pages/todo_list_page.dart';
 import 'package:notes/presentation/providers/todo_provider.dart';
