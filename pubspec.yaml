@@ -39,10 +39,16 @@ flutter:
   assets:
     - assets/databases/comprehensive_search.db
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icon/note_icon.jpg"  # Path to your 1024x1024 icon
+  macos:
+    generate: true
+    image_path: "assets/icon/note_icon.jpg"
+  windows:
+    generate: true
+    image_path: "assets/icon/note_icon.jpg"
+  image_path: "assets/icon/note_icon.jpg"  # Path to your icon
   # Optional: specify different icons for different platforms
   # android_icon_path: "assets/icon/android_icon.png"
   # ios_icon_path: "assets/icon/ios_icon.png"
