@@ -77,7 +77,7 @@ class ThemeSelectorSheet extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Sáng',
+                    'Light',
                     style: TextStyle(
                       color: themeProvider.themeMode == ThemeMode.light
                           ? CupertinoColors.systemBlue
@@ -106,7 +106,7 @@ class ThemeSelectorSheet extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Tối',
+                    'Dark',
                     style: TextStyle(
                       color: themeProvider.themeMode == ThemeMode.dark
                           ? CupertinoColors.systemBlue
@@ -135,7 +135,7 @@ class ThemeSelectorSheet extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Hệ thống',
+                    'System',
                     style: TextStyle(
                       color: themeProvider.themeMode == ThemeMode.system
                           ? CupertinoColors.systemBlue
