@@ -14,6 +14,7 @@ platform :android do
       android_artifact_type: "APK",
       android_artifact_path: "../build/app/outputs/flutter-apk/app-release.apk",
       release_notes: "Automated build from CI/CD pipeline",
+      groups: "1", 
       debug: true  # Thêm debug mode
     )
   end
