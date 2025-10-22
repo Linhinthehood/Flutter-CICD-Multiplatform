@@ -22,7 +22,7 @@ class ThemeToggleButton extends StatelessWidget {
               color: CupertinoTheme.of(context).barBackgroundColor,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: CupertinoTheme.of(context).primaryColor.withOpacity(0.3),
+                color: CupertinoTheme.of(context).primaryColor.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -180,7 +180,7 @@ class ThemeToggleButtonWithSheet extends StatelessWidget {
               color: CupertinoTheme.of(context).barBackgroundColor,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: CupertinoTheme.of(context).primaryColor.withOpacity(0.3),
+                color: CupertinoTheme.of(context).primaryColor.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),

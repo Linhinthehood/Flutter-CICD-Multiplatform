@@ -24,7 +24,7 @@ class AppTheme {
   
   // Light Theme
   static CupertinoThemeData get lightTheme {
-    return CupertinoThemeData(
+    return const CupertinoThemeData(
       brightness: Brightness.light,
       primaryColor: lightPrimaryColor,
       scaffoldBackgroundColor: lightBackgroundColor,
@@ -71,7 +71,7 @@ class AppTheme {
   
   // Dark Theme
   static CupertinoThemeData get darkTheme {
-    return CupertinoThemeData(
+    return const CupertinoThemeData(
       brightness: Brightness.dark,
       primaryColor: darkPrimaryColor,
       scaffoldBackgroundColor: darkBackgroundColor,
