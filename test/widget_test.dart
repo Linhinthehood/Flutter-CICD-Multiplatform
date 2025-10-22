@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:notes/main.dart';
 import 'package:notes/providers/note_provider.dart';
+import 'package:notes/providers/theme_provider.dart';
 import 'package:notes/screens/notes_list_screen.dart';
 
 void main() {
@@ -10,8 +11,15 @@ void main() {
     testWidgets('App should launch without crashing',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        ChangeNotifierProvider<NoteProvider>(
-          create: (_) => NoteProvider.forTesting(),
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ThemeProvider>(
+              create: (_) => ThemeProvider(),
+            ),
+            ChangeNotifierProvider<NoteProvider>(
+              create: (_) => NoteProvider.forTesting(),
+            ),
+          ],
           child: const MyApp(),
         ),
       );
@@ -23,8 +31,15 @@ void main() {
     testWidgets('NotesListScreen displays empty state',
         (WidgetTester tester) async {
       await tester.pumpWidget(
-        ChangeNotifierProvider<NoteProvider>(
-          create: (_) => NoteProvider.forTesting(),
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ThemeProvider>(
+              create: (_) => ThemeProvider(),
+            ),
+            ChangeNotifierProvider<NoteProvider>(
+              create: (_) => NoteProvider.forTesting(),
+            ),
+          ],
           child: const CupertinoApp(
             home: NotesListScreen(),
           ),
@@ -37,8 +52,15 @@ void main() {
 
     testWidgets('Can navigate to add note screen', (WidgetTester tester) async {
       await tester.pumpWidget(
-        ChangeNotifierProvider<NoteProvider>(
-          create: (_) => NoteProvider.forTesting(),
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ThemeProvider>(
+              create: (_) => ThemeProvider(),
+            ),
+            ChangeNotifierProvider<NoteProvider>(
+              create: (_) => NoteProvider.forTesting(),
+            ),
+          ],
           child: const CupertinoApp(
             home: NotesListScreen(),
           ),
@@ -53,6 +75,30 @@ void main() {
 
       // Should navigate to edit screen
       expect(find.text('New Note'), findsOneWidget);
+    });
+
+    testWidgets('Theme toggle button should be present',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ThemeProvider>(
+              create: (_) => ThemeProvider(),
+            ),
+            ChangeNotifierProvider<NoteProvider>(
+              create: (_) => NoteProvider.forTesting(),
+            ),
+          ],
+          child: const CupertinoApp(
+            home: NotesListScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Should find theme toggle button in navigation bar
+      expect(find.byType(CupertinoButton), findsWidgets);
     });
   });
 }
