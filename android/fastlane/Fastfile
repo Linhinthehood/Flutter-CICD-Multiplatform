@@ -3,13 +3,18 @@ default_platform(:android)
 platform :android do
   desc "Deploy to Firebase App Distribution"
   lane :deploy_to_firebase do
+    # Kiểm tra biến môi trường
+    unless ENV["FIREBASE_APP_ID"] && ENV["FIREBASE_TOKEN"]
+      UI.user_error!("FIREBASE_APP_ID và FIREBASE_TOKEN phải được thiết lập!")
+    end
+    
     firebase_app_distribution(
       app: ENV["FIREBASE_APP_ID"],
       firebase_cli_token: ENV["FIREBASE_TOKEN"],
       android_artifact_type: "APK",
       android_artifact_path: "../build/app/outputs/flutter-apk/app-release.apk",
-      groups: "testers",
-      release_notes: "Automated build from CI/CD pipeline"
+      release_notes: "Automated build from CI/CD pipeline",
+      debug: true  # Thêm debug mode
     )
   end
 
