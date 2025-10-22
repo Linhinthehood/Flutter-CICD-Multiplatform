@@ -77,13 +77,13 @@ jobs:
         path: build/app/outputs/bundle/release/app-release.aab
         retention-days: 30
     
-    - name: Deploy to Firebase App Distribution
-      env:
-        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
-      run: |
-        cd android
-        bundle exec fastlane deploy_to_firebase
+    # - name: Deploy to Firebase App Distribution
+    #   env:
+    #     FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+    #     FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
+    #   run: |
+    #     cd android
+    #     bundle exec fastlane deploy_to_firebase
 
   # build-ios:
   #   needs: test
