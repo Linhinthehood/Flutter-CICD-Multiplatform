@@ -4,24 +4,27 @@ import 'package:flutter/cupertino.dart';
 class AppTheme {
   // Light Theme Colors
   static const Color lightPrimaryColor = CupertinoColors.systemBlue;
-  static const Color lightBackgroundColor = CupertinoColors.systemGroupedBackground;
-  static const Color lightSecondaryBackgroundColor = CupertinoColors.systemBackground;
+  static const Color lightBackgroundColor =
+      CupertinoColors.systemGroupedBackground;
+  static const Color lightSecondaryBackgroundColor =
+      CupertinoColors.systemBackground;
   static const Color lightTextColor = CupertinoColors.label;
   static const Color lightSecondaryTextColor = CupertinoColors.secondaryLabel;
   static const Color lightTertiaryTextColor = CupertinoColors.tertiaryLabel;
   static const Color lightSeparatorColor = CupertinoColors.separator;
   static const Color lightBorderColor = CupertinoColors.systemGrey4;
-  
+
   // Dark Theme Colors
   static const Color darkPrimaryColor = CupertinoColors.systemBlue;
   static const Color darkBackgroundColor = CupertinoColors.black;
   static const Color darkSecondaryBackgroundColor = CupertinoColors.systemGrey6;
   static const Color darkTextColor = CupertinoColors.white;
-  static const Color darkSecondaryTextColor = CupertinoColors.secondarySystemFill;
+  static const Color darkSecondaryTextColor =
+      CupertinoColors.secondarySystemFill;
   static const Color darkTertiaryTextColor = CupertinoColors.tertiarySystemFill;
   static const Color darkSeparatorColor = CupertinoColors.separator;
   static const Color darkBorderColor = CupertinoColors.systemGrey3;
-  
+
   // Light Theme
   static CupertinoThemeData get lightTheme {
     return const CupertinoThemeData(
@@ -68,7 +71,7 @@ class AppTheme {
       ),
     );
   }
-  
+
   // Dark Theme
   static CupertinoThemeData get darkTheme {
     return const CupertinoThemeData(
@@ -115,47 +118,43 @@ class AppTheme {
       ),
     );
   }
-  
+
   // Helper methods to get colors based on theme
   static Color getBackgroundColor(BuildContext context) {
     final brightness = CupertinoTheme.of(context).brightness;
-    return brightness == Brightness.dark 
-        ? darkBackgroundColor 
+    return brightness == Brightness.dark
+        ? darkBackgroundColor
         : lightBackgroundColor;
   }
-  
+
   static Color getSecondaryBackgroundColor(BuildContext context) {
     final brightness = CupertinoTheme.of(context).brightness;
-    return brightness == Brightness.dark 
-        ? darkSecondaryBackgroundColor 
+    return brightness == Brightness.dark
+        ? darkSecondaryBackgroundColor
         : lightSecondaryBackgroundColor;
   }
-  
+
   static Color getTextColor(BuildContext context) {
     final brightness = CupertinoTheme.of(context).brightness;
-    return brightness == Brightness.dark 
-        ? darkTextColor 
-        : lightTextColor;
+    return brightness == Brightness.dark ? darkTextColor : lightTextColor;
   }
-  
+
   static Color getSecondaryTextColor(BuildContext context) {
     final brightness = CupertinoTheme.of(context).brightness;
-    return brightness == Brightness.dark 
-        ? darkSecondaryTextColor 
+    return brightness == Brightness.dark
+        ? darkSecondaryTextColor
         : lightSecondaryTextColor;
   }
-  
+
   static Color getSeparatorColor(BuildContext context) {
     final brightness = CupertinoTheme.of(context).brightness;
-    return brightness == Brightness.dark 
-        ? darkSeparatorColor 
+    return brightness == Brightness.dark
+        ? darkSeparatorColor
         : lightSeparatorColor;
   }
-  
+
   static Color getBorderColor(BuildContext context) {
     final brightness = CupertinoTheme.of(context).brightness;
-    return brightness == Brightness.dark 
-        ? darkBorderColor 
-        : lightBorderColor;
+    return brightness == Brightness.dark ? darkBorderColor : lightBorderColor;
   }
 }

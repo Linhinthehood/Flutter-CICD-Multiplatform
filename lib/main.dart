@@ -29,8 +29,8 @@ class MyApp extends StatelessWidget {
         builder: (context, themeProvider, child) {
           return CupertinoApp(
             title: 'Flutter Notes',
-            theme: themeProvider.isDarkMode 
-                ? AppTheme.darkTheme 
+            theme: themeProvider.isDarkMode
+                ? AppTheme.darkTheme
                 : AppTheme.lightTheme,
             debugShowCheckedModeBanner: false,
             home: const NotesListScreen(),
