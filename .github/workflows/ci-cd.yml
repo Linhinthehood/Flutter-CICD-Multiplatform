@@ -198,7 +198,7 @@ jobs:
         retention-days: 30
 
   create-release:
-    needs: [build-macos, build-windows]
+    needs: [build-android, build-macos, build-windows]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     
@@ -206,6 +206,18 @@ jobs:
       contents: write
     
     steps:
+    - name: Download Android APK
+      uses: actions/download-artifact@v4
+      with:
+        name: release-apk
+        path: ./artifacts
+    
+    - name: Download Android AAB
+      uses: actions/download-artifact@v4
+      with:
+        name: release-aab
+        path: ./artifacts
+    
     - name: Download macOS App
       uses: actions/download-artifact@v4
       with:
@@ -222,6 +234,8 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
+          ./artifacts/app-release.apk
+          ./artifacts/app-release.aab
           ./artifacts/note_app-macos.zip
           ./artifacts/note_app-windows.zip
         draft: false
