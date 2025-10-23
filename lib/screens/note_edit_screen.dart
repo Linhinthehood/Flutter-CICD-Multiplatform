@@ -354,10 +354,11 @@ class _NoteEditScreenState extends State<NoteEditScreen>
       // Remove the hashtag from the content
       final text = _contentController.text;
       final newText = text.replaceAll('#$tag', tag);
-      
+
       // Update text and reset selection to avoid text input errors
       _contentController.text = newText;
-      _contentController.selection = TextSelection.collapsed(offset: newText.length);
+      _contentController.selection =
+          TextSelection.collapsed(offset: newText.length);
       _hasUnsavedChanges = true;
     });
   }
@@ -843,7 +844,8 @@ class _NoteEditScreenState extends State<NoteEditScreen>
 
               _contentController.text = text;
               // Reset selection to avoid text input errors
-              _contentController.selection = TextSelection.collapsed(offset: text.length);
+              _contentController.selection =
+                  TextSelection.collapsed(offset: text.length);
               _hasUnsavedChanges = true;
             });
           },
@@ -862,7 +864,8 @@ class _NoteEditScreenState extends State<NoteEditScreen>
 
               _contentController.text = text;
               // Reset selection to avoid text input errors
-              _contentController.selection = TextSelection.collapsed(offset: text.length);
+              _contentController.selection =
+                  TextSelection.collapsed(offset: text.length);
               _hasUnsavedChanges = true;
             });
           },
