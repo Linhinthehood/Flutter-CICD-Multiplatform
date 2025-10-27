@@ -208,9 +208,60 @@ jobs:
         path: build/windows/note_app-windows.zip
         retention-days: 30
 
+  build-web:
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.35.2'
+        channel: 'stable'
+    
+    - name: Install dependencies
+      run: flutter pub get
+    
+    - name: Build Web
+      run: |
+        REPO_NAME="${{ github.repository }}"
+        REPO_PATH=$(echo "$REPO_NAME" | cut -d'/' -f2)
+        flutter build web --release --base-href "/${REPO_PATH}/"
+    
+    - name: Create Web archive
+      run: |
+        cd build/web
+        zip -r note_app-web.zip .
+    
+    - name: Upload Web App
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-web
+        path: build/web/note_app-web.zip
+        retention-days: 30
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+    
+    - name: Upload artifact to GitHub Pages
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: build/web
+    
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
   # Notification job - Hiển thị thông báo khi build thành công
   build-success:
-    needs: [build-android, build-macos, build-windows]
+    needs: [build-android, build-macos, build-windows, build-web]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     
@@ -221,10 +272,11 @@ jobs:
         echo "📱 Android APK and AAB uploaded"
         echo "🍎 macOS app uploaded"
         echo "🪟 Windows app uploaded"
+        echo "🌐 Web app uploaded"
         echo "🚀 Ready for deployment!"
 
   create-release:
-    needs: [build-android, build-macos, build-windows]
+    needs: [build-android, build-macos, build-windows, build-web]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     
@@ -256,6 +308,12 @@ jobs:
         name: release-windows
         path: ./artifacts
     
+    - name: Download Web App
+      uses: actions/download-artifact@v4
+      with:
+        name: release-web
+        path: ./artifacts
+    
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
@@ -264,6 +322,7 @@ jobs:
           ./artifacts/app-release.aab
           ./artifacts/note_app-macos.zip
           ./artifacts/note_app-windows.zip
+          ./artifacts/note_app-web.zip
         draft: false
         prerelease: false
         generate_release_notes: true
