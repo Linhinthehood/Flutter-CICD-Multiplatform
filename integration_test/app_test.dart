@@ -217,11 +217,16 @@ void main() {
         Uri.parse('https://jsonplaceholder.typicode.com/todos'),
         headers: {'Content-Type': 'application/json'},
         body: anyNamed('body'),
-      )).thenAnswer((_) async {
+      )).thenAnswer((invocation) async {
+        // Parse the body to get the actual title
+        final body = invocation.namedArguments[const Symbol('body')] as String;
+        final bodyJson = json.decode(body) as Map<String, dynamic>;
+        final actualTitle = bodyJson['title'] as String;
+        
         final response = {
           'id': todoId,
           'userId': 1,
-          'title': 'Todo $todoId',
+          'title': actualTitle,
           'completed': false,
         };
         todoId++;
