@@ -247,8 +247,38 @@ class NoteProvider with ChangeNotifier {
 }
 
 class _MockDBHelper {
-  Future<List<Note>> getAllNotes() async => [];
-  Future<int> insert(Note note) async => 1;
-  Future<int> update(Note note) async => 1;
-  Future<int> delete(int id) async => 1;
+  final List<Note> _notes = [];
+  int _nextId = 1;
+
+  Future<List<Note>> getAllNotes() async => List.from(_notes);
+
+  Future<int> insert(Note note) async {
+    final noteWithId = Note(
+      id: _nextId++,
+      title: note.title,
+      content: note.content,
+      createdAt: note.createdAt,
+      isPinned: note.isPinned,
+      imagePaths: note.imagePaths,
+      audioPaths: note.audioPaths,
+      tags: note.tags,
+    );
+    _notes.add(noteWithId);
+    return noteWithId.id!;
+  }
+
+  Future<int> update(Note note) async {
+    final index = _notes.indexWhere((n) => n.id == note.id);
+    if (index != -1) {
+      _notes[index] = note;
+      return 1;
+    }
+    return 0;
+  }
+
+  Future<int> delete(int id) async {
+    final initialLength = _notes.length;
+    _notes.removeWhere((note) => note.id == id);
+    return initialLength - _notes.length;
+  }
 }
