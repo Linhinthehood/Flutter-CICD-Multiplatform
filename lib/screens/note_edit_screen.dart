@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -352,9 +353,143 @@ class _NoteEditScreenState extends State<NoteEditScreen>
       _tags.remove(tag);
       // Remove the hashtag from the content
       final text = _contentController.text;
-      _contentController.text = text.replaceAll('#$tag', tag);
+      final newText = text.replaceAll('#$tag', tag);
+
+      // Update text and reset selection to avoid text input errors
+      _contentController.text = newText;
+      _contentController.selection =
+          TextSelection.collapsed(offset: newText.length);
       _hasUnsavedChanges = true;
     });
+  }
+
+  void _showDatePicker() {
+    final currentDate = _currentNote?.createdAt ?? DateTime.now();
+    DateTime selectedDate = currentDate;
+
+    showCupertinoModalPopup<DateTime>(
+      context: context,
+      builder: (context) => Container(
+        height: 300,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
+                  ),
+                  const Text(
+                    'Select Date',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      Navigator.pop(context, selectedDate);
+                    },
+                    child: const Text(
+                      'Done',
+                      style: TextStyle(
+                        color: CupertinoColors.activeBlue,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.date,
+                initialDateTime: currentDate,
+                minimumDate: DateTime(1900),
+                maximumDate: DateTime.now().add(const Duration(days: 365)),
+                onDateTimeChanged: (DateTime newDate) {
+                  selectedDate = newDate;
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    ).then((result) {
+      if (result != null) {
+        _updateNoteDate(result);
+      }
+    });
+  }
+
+  void _updateNoteDate(DateTime newDate) async {
+    if (_currentNote == null) return;
+
+    setState(() {
+      _hasUnsavedChanges = true;
+    });
+
+    // Update the current note's date
+    final updatedNote = Note(
+      id: _currentNote!.id,
+      title: _currentNote!.title,
+      content: _currentNote!.content,
+      createdAt: newDate,
+      isPinned: _currentNote!.isPinned,
+      imagePaths: _currentNote!.imagePaths,
+      audioPaths: _currentNote!.audioPaths,
+      tags: _currentNote!.tags,
+    );
+
+    try {
+      final noteProvider = Provider.of<NoteProvider>(context, listen: false);
+      await noteProvider.updateNote(updatedNote);
+      _currentNote = updatedNote;
+
+      if (mounted) {
+        setState(() {
+          _hasUnsavedChanges = false;
+        });
+
+        // Show success message
+        showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('Date Updated'),
+            content: Text(
+                'Note date changed to ${DateFormat.yMMMd().format(newDate)}'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('OK'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        showCupertinoDialog(
+          context: context,
+          builder: (context) => CupertinoAlertDialog(
+            title: const Text('Error'),
+            content: Text('Failed to update date: ${e.toString()}'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('OK'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   void _insertAudioAtCursor(String audioPath) {
@@ -371,8 +506,10 @@ class _NoteEditScreenState extends State<NoteEditScreen>
 
     setState(() {
       _contentController.text = newText;
+      // Ensure selection is within bounds
+      final newOffset = cursorPosition + audioTag.length;
       _contentController.selection = TextSelection.collapsed(
-        offset: cursorPosition + audioTag.length,
+        offset: newOffset.clamp(0, newText.length),
       );
       _hasUnsavedChanges = true;
     });
@@ -392,8 +529,10 @@ class _NoteEditScreenState extends State<NoteEditScreen>
 
     setState(() {
       _contentController.text = newText;
+      // Ensure selection is within bounds
+      final newOffset = cursorPosition + imageTag.length;
       _contentController.selection = TextSelection.collapsed(
-        offset: cursorPosition + imageTag.length,
+        offset: newOffset.clamp(0, newText.length),
       );
       _hasUnsavedChanges = true;
     });
@@ -426,6 +565,7 @@ class _NoteEditScreenState extends State<NoteEditScreen>
         child: Column(
           children: [
             _buildTagsSection(),
+            _buildDateSection(),
             _buildContentSearchBar(),
             _buildContentSection(), // This will now be expanded
             _buildStatusIndicator(),
@@ -531,12 +671,49 @@ class _NoteEditScreenState extends State<NoteEditScreen>
     );
   }
 
+  Widget _buildDateSection() {
+    if (_currentNote == null) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          const Icon(
+            CupertinoIcons.calendar,
+            size: 16,
+            color: CupertinoColors.systemGrey,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Created: ${DateFormat.yMMMd().format(_currentNote!.createdAt)}',
+            style: TextStyle(
+              fontSize: 14,
+              color: CupertinoColors.secondaryLabel.resolveFrom(context),
+            ),
+          ),
+          const Spacer(),
+          CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: _showDatePicker,
+            child: const Text(
+              'Edit',
+              style: TextStyle(
+                color: CupertinoColors.activeBlue,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showMoreOptions() {
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
-        title: const Text('Add to Note'),
-        message: const Text('Choose what you want to add to your note'),
+        title: const Text('Note Options'),
+        message: const Text('Choose what you want to do with your note'),
         actions: [
           CupertinoActionSheetAction(
             onPressed: () {
@@ -573,6 +750,26 @@ class _NoteEditScreenState extends State<NoteEditScreen>
                 SizedBox(width: 12),
                 Text(
                   'Add Audio',
+                  style: TextStyle(color: CupertinoColors.activeBlue),
+                ),
+              ],
+            ),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+              _showDatePicker();
+            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  CupertinoIcons.calendar,
+                  color: CupertinoColors.activeBlue,
+                ),
+                SizedBox(width: 12),
+                Text(
+                  'Edit Date',
                   style: TextStyle(color: CupertinoColors.activeBlue),
                 ),
               ],
@@ -646,6 +843,9 @@ class _NoteEditScreenState extends State<NoteEditScreen>
               }
 
               _contentController.text = text;
+              // Reset selection to avoid text input errors
+              _contentController.selection =
+                  TextSelection.collapsed(offset: text.length);
               _hasUnsavedChanges = true;
             });
           },
@@ -663,6 +863,9 @@ class _NoteEditScreenState extends State<NoteEditScreen>
               }
 
               _contentController.text = text;
+              // Reset selection to avoid text input errors
+              _contentController.selection =
+                  TextSelection.collapsed(offset: text.length);
               _hasUnsavedChanges = true;
             });
           },
