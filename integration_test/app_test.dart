@@ -7,7 +7,6 @@ import 'package:notes/screens/notes_list_screen.dart';
 import 'package:notes/providers/theme_provider.dart';
 import 'package:notes/models/note.dart';
 
-
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -47,7 +46,8 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       // Step 2: Add a note programmatically (simulating the save)
-      await noteProvider.addNote('My First Note', 'This is the content of my first note.');
+      await noteProvider.addNote(
+          'My First Note', 'This is the content of my first note.');
       await tester.pumpAndSettle();
 
       // Pause to show the newly created note
@@ -91,7 +91,8 @@ void main() {
 
       // Step 1: Verify note is loaded and appears in a month section
       expect(find.text('Test Note'), findsOneWidget);
-      final monthSections = find.textContaining(RegExp(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}'));
+      final monthSections = find.textContaining(
+          RegExp(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}'));
       expect(monthSections, findsWidgets);
 
       // Pause before pinning
@@ -127,8 +128,7 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
     });
 
-    testWidgets('Delete note flow',
-        (WidgetTester tester) async {
+    testWidgets('Delete note flow', (WidgetTester tester) async {
       // Act - Start the app
       await tester.pumpWidget(
         MultiProvider(
@@ -174,8 +174,7 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
     });
 
-    testWidgets('Multiple notes persistence',
-        (WidgetTester tester) async {
+    testWidgets('Multiple notes persistence', (WidgetTester tester) async {
       // Act - Start the app
       await tester.pumpWidget(
         MultiProvider(
@@ -216,7 +215,8 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       // Delete one note
-      final noteToDelete = noteProvider.notes.firstWhere((n) => n.title == 'Note 2');
+      final noteToDelete =
+          noteProvider.notes.firstWhere((n) => n.title == 'Note 2');
       await noteProvider.deleteNote(noteToDelete.id!);
       await tester.pumpAndSettle();
 
@@ -232,8 +232,7 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
     });
 
-    testWidgets('Update existing note',
-        (WidgetTester tester) async {
+    testWidgets('Update existing note', (WidgetTester tester) async {
       // Act - Start the app
       await tester.pumpWidget(
         MultiProvider(
@@ -289,8 +288,7 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
     });
 
-    testWidgets('Empty state validation',
-        (WidgetTester tester) async {
+    testWidgets('Empty state validation', (WidgetTester tester) async {
       // Act - Start the app with no notes
       await tester.pumpWidget(
         MultiProvider(
@@ -354,7 +352,10 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       // Step 2: Find and tap a section header to collapse
-      final monthSection = find.textContaining(RegExp(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}')).first;
+      final monthSection = find
+          .textContaining(RegExp(
+              r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}'))
+          .first;
       await tester.tap(monthSection);
       await tester.pumpAndSettle();
 
@@ -364,7 +365,7 @@ void main() {
       // Step 3: Verify notes in that section are hidden
       // After collapsing, at least one note should be hidden
       final visibleNotes = tester.widgetList(find.text('Note 1')).length +
-                           tester.widgetList(find.text('Note 2')).length;
+          tester.widgetList(find.text('Note 2')).length;
       expect(visibleNotes, lessThan(2));
 
       // Pause before expanding
@@ -424,7 +425,8 @@ void main() {
       expect(find.text('Third Note'), findsOneWidget);
 
       // Verify they're all in the same month section
-      final monthSection = find.textContaining(RegExp(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}'));
+      final monthSection = find.textContaining(
+          RegExp(r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}'));
       expect(monthSection, findsWidgets);
 
       // Final pause
